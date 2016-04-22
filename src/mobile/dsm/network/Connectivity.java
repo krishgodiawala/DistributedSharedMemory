@@ -1,7 +1,7 @@
 package mobile.dsm.network;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.BufferedReader;
+import java.io.PrintWriter;
 
 /**
  * @author Vishwas Tantry
@@ -16,14 +16,14 @@ public interface Connectivity {
 	 * 
 	 * @return the DataOutputStream
 	 */
-	public abstract DataInputStream readerConnection();
+	public abstract BufferedReader readerConnection();
 
 	/**
 	 * This method instantiates a writer stream
 	 * 
 	 * @return the DataOutputStream
 	 */
-	public abstract DataOutputStream writerConnection();
+	public abstract PrintWriter writerConnection();
 
 	/**
 	 * This method closes the connection

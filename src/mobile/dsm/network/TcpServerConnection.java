@@ -1,8 +1,9 @@
 package mobile.dsm.network;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -12,9 +13,11 @@ import java.net.Socket;
  */
 public class TcpServerConnection implements Connectivity {
 	private ServerSocket serverSocket;
-	private DataInputStream in;
+	// private DataInputStream in;
 	private Socket socket;
-	private DataOutputStream out;
+	// private DataOutputStream out;
+	private BufferedReader br;
+	private PrintWriter pw;
 
 	public TcpServerConnection(int port) {
 		try {
@@ -30,13 +33,14 @@ public class TcpServerConnection implements Connectivity {
 	 * 
 	 * @return the DataOutputStream
 	 */
-	public DataInputStream readerConnection() {
+	public BufferedReader readerConnection() {
 		try {
 			if (socket == null) {
 				socket = serverSocket.accept();
 			}
-			in = new DataInputStream(socket.getInputStream());
-			return in;
+			br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			// in = new DataInputStream(socket.getInputStream());
+			return br;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -50,27 +54,15 @@ public class TcpServerConnection implements Connectivity {
 	 * 
 	 * @return the DataOutputStream
 	 */
-	public DataOutputStream writerConnection() {
+	public PrintWriter writerConnection() {
 		try {
 			if (socket == null) {
 				socket = serverSocket.accept();
 			}
-			out = new DataOutputStream(socket.getOutputStream());
-			return out;
+			// out = new DataOutputStream(socket.getOutputStream());
+			pw = new PrintWriter(socket.getOutputStream(), true);
+			return pw;
 		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-
-	}
-
-	public String read() {
-		if (in == null)
-			throw new NullPointerException();
-		try {
-			return in.readUTF();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -84,10 +76,10 @@ public class TcpServerConnection implements Connectivity {
 		try {
 			if (socket != null)
 				socket.close();
-			if (out != null)
-				out.close();
-			if (in != null)
-				in.close();
+			if (br != null)
+				br.close();
+			if (pw != null)
+				pw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
