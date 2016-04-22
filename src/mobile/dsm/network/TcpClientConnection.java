@@ -45,6 +45,10 @@ public class TcpClientConnection implements Connectivity {
 		return null;
 	}
 
+	public Socket createConnection() {
+		return socket;
+	}
+
 	@Override
 	public PrintWriter writerConnection() {
 		try {

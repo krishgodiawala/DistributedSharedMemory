@@ -2,6 +2,7 @@ package mobile.dsm.network;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
+import java.net.Socket;
 
 /**
  * @author Vishwas Tantry
@@ -29,4 +30,10 @@ public interface Connectivity {
 	 * This method closes the connection
 	 */
 	public abstract void close();
+
+	/**
+	 * Returns the socket created
+	 * 
+	 */
+	public abstract Socket createConnection();
 }

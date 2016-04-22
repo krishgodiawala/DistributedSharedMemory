@@ -49,6 +49,17 @@ public class TcpServerConnection implements Connectivity {
 		return null;
 	}
 
+	public Socket createConnection() {
+		try {
+			if (socket == null)
+				socket = serverSocket.accept();
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+		return socket;
+	}
+
 	/**
 	 * This method instantiates a writer stream
 	 * 
