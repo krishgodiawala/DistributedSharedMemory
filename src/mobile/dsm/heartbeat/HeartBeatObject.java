@@ -42,5 +42,5 @@ public class HeartBeatObject implements Serializable {
 	public String getRaspberryPieId() {
 		return raspberryPieId;
 	}
-
+	
 }

@@ -12,6 +12,7 @@ import java.net.Socket;
  * @author Vishwas Tantry
  * @author Krish Godiawala
  */
+@Deprecated
 public class TcpClientConnection implements Connectivity {
 	private Socket socket;
 	// private DataInputStream in;
@@ -77,6 +78,30 @@ public class TcpClientConnection implements Connectivity {
 			e.printStackTrace();
 		}
 
+	}
+
+	/**
+	 * This method writes to the network
+	 */
+	@Override
+	public void write(String output) {
+		if (pw == null)
+			this.writerConnection();
+		pw.write(output);
+	}
+
+	/**
+	 * This method reads the data from the network
+	 */
+	@Override
+	public String read() {
+		try {
+			return br.readLine();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }

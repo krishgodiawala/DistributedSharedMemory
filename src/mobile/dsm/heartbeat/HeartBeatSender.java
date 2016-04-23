@@ -1,35 +1,53 @@
 package mobile.dsm.heartbeat;
 
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import mobile.dsm.network.Connectivity;
+import mobile.dsm.network.TcpServerConnection;
+import mobile.dsm.utils.HostName_Port;
 import mobile.dsm.utils.Utility;
 
 /**
  * This class sends heart beats every 5 seconds
  * 
+ * @author Vishwas Tantry
  * @author Krish Godiawala
  *
  */
-public class HeartBeatSender implements Runnable {
+public class HeartBeatSender {
 	Runtime runtime;
 	public final String raspberryPieId;
+	private ScheduledExecutorService execute;
+	private TcpServerConnection conn;
 
 	public HeartBeatSender(String raspberryPieID) {
 		this.raspberryPieId = raspberryPieID;
+		conn = new TcpServerConnection(HostName_Port.HEARTBEATMANAGER_HOSTNAME, HostName_Port.HEARTBEATMANAGER_PORT);
+		conn.writerConnection();
 	}
 
-	@Override
-	public void run() {
-		sendHeartBeat();
-	}
+	/**
+	 * This sends heartsBeat messages
+	 */
+	private Runnable heartbeatsend = new Runnable() {
+		public void run() {
+			sendHeartBeat();
+		}
+	};
 
 	private void sendHeartBeat() {
-		while (true) {
-			try {
+		conn.writeObject(this.creatObject());
+	}
 
-				Thread.sleep(Utility.HEARTBEATTIME);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+	/**
+	 * This method enables the executor service and begins to send heartbeat
+	 * messages
+	 */
+	public void enable(ScheduledExecutorService executor) {
+		if (executor != null) {
+			this.execute = executor;
+			execute.scheduleAtFixedRate(heartbeatsend, 0, Utility.HEARTBEATTIME, TimeUnit.SECONDS);
 		}
 	}
 

@@ -36,4 +36,16 @@ public interface Connectivity {
 	 * 
 	 */
 	public abstract Socket createConnection();
+
+	/**
+	 * This method writes to connection
+	 * 
+	 * @param output
+	 */
+	public abstract void write(String output);
+
+	/**
+	 * This method reads from standard Input
+	 */
+	public abstract String read();
 }
