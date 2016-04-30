@@ -42,6 +42,10 @@ public class TcpServerConnection implements Connectivity {
 		}
 	}
 
+	public TcpServerConnection() {
+
+	}
+
 	/**
 	 * This method instantiates a reader stream
 	 * 
@@ -49,10 +53,10 @@ public class TcpServerConnection implements Connectivity {
 	 */
 	public BufferedReader readerConnection() {
 		try {
-			if (socket == null) {
-				if (!isClientSocket)
-					socket = serverSocket.accept();
-			}
+			// if (socket == null) {
+			if (!isClientSocket)
+				socket = serverSocket.accept();
+			// }
 			br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			// in = new DataInputStream(socket.getInputStream());
 			return br;
@@ -66,9 +70,9 @@ public class TcpServerConnection implements Connectivity {
 
 	public Socket createConnection() {
 		try {
-			if (socket == null)
-				if (!isClientSocket)
-					socket = serverSocket.accept();
+			// if (socket == null)
+			if (!isClientSocket)
+				socket = serverSocket.accept();
 		} catch (IOException e) {
 
 			e.printStackTrace();
@@ -102,12 +106,18 @@ public class TcpServerConnection implements Connectivity {
 	 */
 	public void close() {
 		try {
-			if (socket != null)
+			if (socket != null) {
 				socket.close();
-			if (br != null)
+				socket = null;
+			}
+			if (br != null) {
 				br.close();
-			if (pw != null)
+				br = null;
+			}
+			if (pw != null) {
 				pw.close();
+				pw.close();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -120,7 +130,7 @@ public class TcpServerConnection implements Connectivity {
 	public void write(String output) {
 		if (pw == null)
 			this.writerConnection();
-		pw.write(output);
+		pw.println(output);
 	}
 
 	/**
