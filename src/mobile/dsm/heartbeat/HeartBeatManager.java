@@ -1,7 +1,7 @@
 package mobile.dsm.heartbeat;
 
 /**
- * This class is a tracks the heart beats 
+ * This class is a tracks the heart beats
  * 
  * @author Vishwas Tantry
  * @author Krish Godiawala
@@ -10,13 +10,11 @@ package mobile.dsm.heartbeat;
 public class HeartBeatManager implements Runnable {
 
 	public HeartBeatManager() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	@Override
 	public void run() {
 		
-
 	}
-
 }
