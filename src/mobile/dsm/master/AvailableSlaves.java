@@ -16,7 +16,7 @@ public class AvailableSlaves {
 	public static List<SlaveInformation> availableSlaves() {
 		List<SlaveInformation> slavesWithAvailableMemory = new ArrayList<SlaveInformation>();
 		for (Entry<SlaveInformation, SlaveInformation> slaveInfo : allSlaves.entrySet()) {
-			if ((slaveInfo.getValue().usedHeapSize - (Utility.MAX_SLAVE_BACKUP_SPACE)) < Utility.MAX_SLAVE_MEMORY) {
+			if ((slaveInfo.getValue().usedHeapSize) < Utility.MAX_SLAVE_MEMORY) {
 				slavesWithAvailableMemory.add(slaveInfo.getValue());
 			}
 		}
