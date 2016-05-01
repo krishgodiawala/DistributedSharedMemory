@@ -33,6 +33,10 @@ public class TcpServerConnection implements Connectivity {
 		}
 	}
 
+	public TcpServerConnection(Socket socket) {
+		this.socket = socket;
+	}
+
 	public TcpServerConnection(String ipAddress, int port) {
 		try {
 			this.socket = new Socket(ipAddress, port);

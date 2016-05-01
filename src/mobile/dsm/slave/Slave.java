@@ -18,7 +18,6 @@ public class Slave implements Runnable {
 	public Slave() {
 		conn = new TcpServerConnection(HostName_Port.SLAVE_SERVER_CONN_PORT);
 		files = new HashMap<String, File>();
-		// files = new HashSet<File>();
 	}
 
 	@Override

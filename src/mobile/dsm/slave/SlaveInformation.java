@@ -6,6 +6,7 @@ public class SlaveInformation implements Comparable<SlaveInformation> {
 	public long usedHeapSize;
 	public long totalHeapSize;
 	public long availableDiskSpace;
+	public long timeStamp;
 
 	public SlaveInformation(String ipAddress, long availableHeapSize, long usedHeapSize, long totalHeapSize,
 			long availableDiskSpace) {
@@ -20,6 +21,10 @@ public class SlaveInformation implements Comparable<SlaveInformation> {
 	@Override
 	public int compareTo(SlaveInformation o) {
 		return Long.compare(this.availableHeapSize, o.availableHeapSize);
+	}
+
+	public void timeStamp() {
+		timeStamp = System.currentTimeMillis();
 	}
 
 }
