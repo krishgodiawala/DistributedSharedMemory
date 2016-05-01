@@ -9,9 +9,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import FileReading.FileChunks;
 import mobile.dsm.network.TcpServerConnection;
 import mobile.dsm.slave.SlaveInformation;
+import mobile.dsm.utils.FileChunks;
 import mobile.dsm.utils.HostName_Port;
 
 public class SharedMemory {

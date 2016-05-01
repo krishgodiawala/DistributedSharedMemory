@@ -1,5 +1,5 @@
 
-package FileReading;
+package mobile.dsm.utils;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
