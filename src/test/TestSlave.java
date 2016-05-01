@@ -21,5 +21,10 @@ public class TestSlave {
 		HeartBeatSender heartbeatSender = new HeartBeatSender("localhost");
 		ScheduledExecutorService execute = Executors.newSingleThreadScheduledExecutor();
 		heartbeatSender.enable(execute);
+		TestSlave tsy = new TestSlave();
+	}
+
+	public static void test() {
+
 	}
 }

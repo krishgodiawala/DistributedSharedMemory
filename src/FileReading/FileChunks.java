@@ -1,3 +1,4 @@
+
 package FileReading;
 
 import java.io.BufferedOutputStream;
@@ -7,48 +8,42 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 public class FileChunks {
+	int chunk_number = 0;
+	int last_read = 0;
 
-	public static List<File> put(File file) throws IOException {
-		List<File> listofchunks = new ArrayList<File>();
-		int size_of_chunks = 1024;
-		byte filechunks[] = new byte[size_of_chunks];
-		int chunk_number = 0;
-		FileInputStream file_input = new FileInputStream(file);
-
-		int rc = file_input.read(filechunks);
-		while (rc == 1024) {
-			chunk_number++;
-			File file_chunks = new File(file.getParent(), file.getName() + "." + chunk_number);
-			listofchunks.add(file_chunks);
-			try (FileOutputStream out = new FileOutputStream(file_chunks)) {
-				out.write(filechunks, 0, rc);
-			}
-
-			filechunks = new byte[1024];
-			rc = file_input.read(filechunks);
-
-		}
-
-		byte[] filechunks1 = Arrays.copyOfRange(filechunks, 0, rc);
-		chunk_number++;
-		File file_chunks = new File(file.getParent(), file.getName() + "." + chunk_number);
-		listofchunks.add(file_chunks);
-		try (FileOutputStream out = new FileOutputStream(file_chunks)) {
-			out.write(filechunks1, 0, rc);
-		}
-		return listofchunks;
+	public FileChunks() {
 
 	}
 
-	public static File get(List<File> listoffiles) {
+	public File put(File file, int size) throws IOException {
+		int size_of_chunks = 0;
 
+		if (file.length() - last_read >= size) {
+			size_of_chunks = size;
+		} else {
+			size_of_chunks = (int) (file.length() - last_read);
+		}
+		byte filechunks[] = new byte[size_of_chunks];
+		FileInputStream file_input = new FileInputStream(file);
+		int rc = file_input.read(filechunks);
+
+		chunk_number++;
+		File file_chunks = new File(file.getParent(), file.getName() + "." + chunk_number);
+		try (FileOutputStream out = new FileOutputStream(file_chunks)) {
+			out.write(filechunks, last_read, rc);
+		}
+
+		last_read = last_read + size;
+
+		return file_chunks;
+	}
+
+	public File get(List<File> listoffiles) {
 		String chunk_name = listoffiles.get(0).getName();
 		int file_separator_position = chunk_name.lastIndexOf(".");
 		String parent_name = chunk_name.substring(0, file_separator_position);

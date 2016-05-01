@@ -50,6 +50,12 @@ public class TcpServerConnection implements Connectivity {
 
 	}
 
+	public Socket getSocket() {
+		if (this.socket != null)
+			return socket;
+		return null;
+	}
+
 	/**
 	 * This method instantiates a reader stream
 	 * 
@@ -183,5 +189,22 @@ public class TcpServerConnection implements Connectivity {
 			e.printStackTrace();
 		}
 		return obj;
+	}
+
+	/*
+	 * This method writes the byte array onto the network
+	 * 
+	 * @param obj
+	 */
+	public void writeByte(byte[] m) {
+		try {
+			if (this.oos == null)
+				this.oos = new ObjectOutputStream(this.socket.getOutputStream());
+			this.oos.write(m);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 }

@@ -1,6 +1,7 @@
 package mobile.dsm.slave;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -18,6 +19,7 @@ public class Slave implements Runnable {
 	public Slave() {
 		conn = new TcpServerConnection(HostName_Port.SLAVE_SERVER_CONN_PORT);
 		files = new HashMap<String, File>();
+		// files = new HashSet<File>();
 	}
 
 	@Override
@@ -37,24 +39,29 @@ public class Slave implements Runnable {
 						File fileName = (File) conn.readObject();
 						this.files.put(fileName.getName(), fileName);
 					} else if (conn.read().equalsIgnoreCase("backup")) {
-						File fileName;
-						while (true) {
-							fileName = (File) conn.readObject();
-							WriteToDisk.write(fileName);
+						String m[] = conn.read().split("||");
+						String filename = m[0];
+						int length = Integer.parseInt(m[1]);
+						try {
+							WriteToDisk.write(filename, conn, length, Integer.parseInt(m[2]));
+						} catch (NumberFormatException | IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
+
 					}
 				} else
 					continue;
 			} else if (conn.read().equals("delete")) {
-				if (conn.read().equalsIgnoreCase("main")) {
-					File fileName = (File) conn.readObject();
-					this.files.remove(fileName.getName());
-				} else if (conn.read().equalsIgnoreCase("backup")) {
-					File fileName = (File) conn.readObject();
-					WriteToDisk.deleteFile(fileName.getName());
-				}
+				String fileName = conn.read();
+				WriteToDisk.deleteFile(fileName);
+				
+			} else if (conn.read().equalsIgnoreCase("deletechunk")) {
+				String fileName = conn.read();
+				if (this.files.containsKey(fileName))
+					this.files.remove(fileName);
+
 			}
 		}
 	}
-
 }
