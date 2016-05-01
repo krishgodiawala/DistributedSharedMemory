@@ -1,4 +1,4 @@
-package mobile.dsm.test;
+package test;
 
 public class TestSlave {
 
