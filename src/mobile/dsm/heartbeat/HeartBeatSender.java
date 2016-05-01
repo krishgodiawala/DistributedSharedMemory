@@ -23,8 +23,7 @@ public class HeartBeatSender {
 
 	public HeartBeatSender(String raspberryPieID) {
 		this.raspberryPieId = raspberryPieID;
-		conn = new TcpServerConnection(HostName_Port.HEARTBEATMANAGER_HOSTNAME, HostName_Port.HEARTBEATMANAGER_PORT);
-		conn.writerConnection();
+
 	}
 
 	/**
@@ -37,7 +36,11 @@ public class HeartBeatSender {
 	};
 
 	private void sendHeartBeat() {
+		System.out.println(this.raspberryPieId + " Sending heartbeat");
+		conn = new TcpServerConnection(HostName_Port.HEARTBEATMANAGER_HOSTNAME, HostName_Port.HEARTBEATMANAGER_PORT);
+		conn.writerConnection();
 		conn.writeObject(this.creatObject());
+		conn.close();
 	}
 
 	/**

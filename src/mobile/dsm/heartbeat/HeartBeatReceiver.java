@@ -25,10 +25,13 @@ public class HeartBeatReceiver extends Thread {
 	public void run() {
 		HeartBeatObject hbo = (HeartBeatObject) this.conn.readObject();
 		if (AvailableSlaves.allSlaves.containsKey(hbo.raspberryPieId)) {
+			System.out.println("Update");
 			AvailableSlaves.update(hbo);
 		} else {
+			System.out.println("New Slave");
 			AvailableSlaves.newSlave(hbo);
 		}
+		conn.close();
 	}
 
 }

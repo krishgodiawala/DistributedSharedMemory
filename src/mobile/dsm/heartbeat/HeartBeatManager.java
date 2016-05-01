@@ -28,14 +28,18 @@ public class HeartBeatManager implements Runnable {
 
 	private Runnable nodeAlive = new Runnable() {
 		public void run() {
+			System.out.println("Manager run called");
 			checkisAlive();
 		}
 	};
 
 	private void checkisAlive() {
 		for (Entry<String, SlaveInformation> slaveInfo : AvailableSlaves.allSlaves.entrySet()) {
+			System.out.println(System.currentTimeMillis() + " " + slaveInfo.getValue().timeStamp + " "
+					+ (System.currentTimeMillis() - slaveInfo.getValue().timeStamp));
 			if ((System.currentTimeMillis() - slaveInfo.getValue().timeStamp) > Utility.HEART_BEAT_DIFFERENCE) {
 				System.err.println("NODE DOWN");
+				AvailableSlaves.allSlaves.remove(slaveInfo.getKey());
 				runBackUp();
 			}
 		}
@@ -45,7 +49,7 @@ public class HeartBeatManager implements Runnable {
 		if (executor != null) {
 			new Thread(this).start();
 			this.execute = executor;
-			execute.scheduleAtFixedRate(nodeAlive, 0, Utility.HEART_BEAT_DIFFERENCE, TimeUnit.SECONDS);
+			execute.scheduleAtFixedRate(nodeAlive, 0, Utility.HEART_BEAT_CHECK, TimeUnit.SECONDS);
 		}
 	}
 
