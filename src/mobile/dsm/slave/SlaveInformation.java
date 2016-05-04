@@ -7,6 +7,7 @@ public class SlaveInformation implements Comparable<SlaveInformation> {
 	public long totalHeapSize;
 	public long availableDiskSpace;
 	public long timeStamp;
+	public boolean isBusy;
 
 	public SlaveInformation(String ipAddress, long availableHeapSize, long usedHeapSize, long totalHeapSize,
 			long availableDiskSpace) {
@@ -25,6 +26,29 @@ public class SlaveInformation implements Comparable<SlaveInformation> {
 
 	public void timeStamp() {
 		timeStamp = System.currentTimeMillis();
+	}
+
+	public SlaveInformation copy(SlaveInformation sl) {
+		this.ipAddress = sl.ipAddress;
+		this.availableHeapSize = sl.availableHeapSize;
+		this.usedHeapSize = sl.usedHeapSize;
+		this.totalHeapSize = sl.totalHeapSize;
+		this.availableDiskSpace = sl.availableDiskSpace;
+		this.timeStamp = sl.timeStamp;
+		this.isBusy = sl.isBusy;
+		return this;
+	}
+
+	public Object clone() {
+		try {
+			SlaveInformation sio = (SlaveInformation) super.clone();
+			sio.copy(this);
+			return sio;
+		} catch (CloneNotSupportedException e) {
+			// TODO Auto-generated catch block
+			throw new RuntimeException("Shouldn't happen");
+		}
+
 	}
 
 }
