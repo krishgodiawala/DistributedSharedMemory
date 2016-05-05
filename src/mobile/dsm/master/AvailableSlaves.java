@@ -101,6 +101,7 @@ public class AvailableSlaves {
 		}
 	}
 
+	/// Update code to update the returned information
 	public static void returnSlaves(List<MemorySlave> returningSlaves) {
 		synchronized (allSlaves) {
 			setIsBusyOrNot(returningSlaves, false);

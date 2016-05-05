@@ -34,6 +34,7 @@ public class TcpServerConnection implements Connectivity {
 	}
 
 	public TcpServerConnection(Socket socket) {
+		isClientSocket = true;
 		this.socket = socket;
 	}
 

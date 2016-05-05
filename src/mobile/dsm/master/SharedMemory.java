@@ -2,8 +2,8 @@ package mobile.dsm.master;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.AllPermission;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,16 +14,30 @@ import mobile.dsm.slave.SlaveInformation;
 import mobile.dsm.utils.FileChunks;
 import mobile.dsm.utils.HostName_Port;
 
-public class SharedMemory {
+public class SharedMemory implements Runnable {
 
-	static ConcurrentHashMap<String, ConcurrentHashMap<String, Integer>> shared = new ConcurrentHashMap<String, ConcurrentHashMap<String, Integer>>();
-	// ConcurrentHashMap<String, Integer> pi_chunk_location = new
-	// ConcurrentHashMap<String, Integer>();
+	static ConcurrentHashMap<String, List<MemorySlave>> shared = new ConcurrentHashMap<String, List<MemorySlave>>();
 
 	/*
 	 * This create file creates chunks of the file and send the data to the
 	 * available nodes
 	 */
+
+	public static List<MemorySlave> getSlaves(String fileName) {
+		if (shared.contains(fileName)) {
+			AvailableSlaves.getLockOnSlaves(shared.get(fileName));
+			return shared.get(fileName);
+		}
+		return new ArrayList<MemorySlave>();
+	}
+
+	public static void returnSlaves(List<MemorySlave> slaves) {
+		AvailableSlaves.returnSlaves(slaves);
+	}
+
+	public static List<MemorySlave> getSlaves(long memory) {
+		return AvailableSlaves.getSlaves(memory);
+	}
 
 	public void createFile(File filename) {
 
@@ -150,6 +164,11 @@ public class SharedMemory {
 			// conn.writeObject(f.put(filename,));
 			// }
 		}
+
+	}
+
+	@Override
+	public void run() {
 
 	}
 }
