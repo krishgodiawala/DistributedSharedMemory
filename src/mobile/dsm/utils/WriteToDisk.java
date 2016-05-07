@@ -30,6 +30,7 @@ public class WriteToDisk {
 		}
 
 		fileoutput.write(reader.read(b, 0, (int) filelength - (60 * (numberOfChunks - 1))));
+		fileoutput.flush();
 		fileoutput.close();
 	}
 
@@ -37,7 +38,7 @@ public class WriteToDisk {
 		TcpServerConnection conn = new TcpServerConnection(ipAddress, port);
 		int size_of_chunks = 60;
 		byte filechunks[] = new byte[size_of_chunks];
-//		int chunk_number = 0;
+		int chunk_number = 0;
 		FileInputStream file_input = new FileInputStream(fileName);
 
 		int rc = file_input.read(filechunks);

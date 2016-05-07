@@ -14,11 +14,12 @@ public class AvailableSlaves {
 
 	public static ConcurrentHashMap<String, SlaveInformation> allSlaves = new ConcurrentHashMap<String, SlaveInformation>();
 
+	@Deprecated
 	public static List<SlaveInformation> availableSlaves() {
 		List<SlaveInformation> slavesWithAvailableMemory = new ArrayList<SlaveInformation>();
 		for (Entry<String, SlaveInformation> slaveInfo : allSlaves.entrySet()) {
 			if ((slaveInfo.getValue().usedHeapSize) < Utility.MAX_SLAVE_MEMORY) {
-				slavesWithAvailableMemory.add(slaveInfo.getValue());
+				slavesWithAvailableMemory.add((SlaveInformation) slaveInfo.getValue().clone());
 			}
 		}
 		Collections.sort(slavesWithAvailableMemory);
@@ -31,7 +32,7 @@ public class AvailableSlaves {
 			long totalRequiredMemory = memory;
 			List<SlaveInformation> alist = new ArrayList<SlaveInformation>();
 			for (Entry<String, SlaveInformation> slaveInfo : allSlaves.entrySet()) {
-				alist.add(slaveInfo.getValue());
+				alist.add((SlaveInformation) slaveInfo.getValue().clone());
 			}
 			Collections.sort(alist);
 			outer: while (alist.size() <= 2) {
@@ -97,15 +98,23 @@ public class AvailableSlaves {
 					}
 				}
 			}
-			// setIsBusyOrNot(slavesWithAvailableMemory, value);
+			setIsBusyOrNot(lockOnSlaves, true);
 		}
 	}
 
 	/// Update code to update the returned information
 	public static void returnSlaves(List<MemorySlave> returningSlaves) {
 		synchronized (allSlaves) {
+			updateValues(returningSlaves);
 			setIsBusyOrNot(returningSlaves, false);
 			allSlaves.notifyAll();
+		}
+	}
+
+	private static void updateValues(List<MemorySlave> returningSlaves) {
+		for (int i = 0; i < returningSlaves.size(); i++) {
+			SlaveInformation sio = allSlaves.get(returningSlaves.get(i).ipAdress);
+			sio.availableHeapSize = returningSlaves.get(i).memory;
 		}
 
 	}
@@ -126,10 +135,11 @@ public class AvailableSlaves {
 			slavesWithAvailableMemory.add(new MemorySlave(alist.get(i).ipAddress, allocate));
 	}
 
-	public static void update(HeartBeatObject hbo) {
-		SlaveInformation si = allSlaves.get(hbo.raspberryPieId);
+	public static void update(String raspberryPie) {
+		SlaveInformation si = allSlaves.get(raspberryPie);
 		System.out.println("in update");
-		set(hbo, si);
+		si.timeStamp();
+		// set(hbo, si);
 	}
 
 	public static void newSlave(HeartBeatObject hbo) {

@@ -1,6 +1,6 @@
 package mobile.dsm.slave;
 
-public class SlaveInformation implements Comparable<SlaveInformation> {
+public class SlaveInformation implements Comparable<SlaveInformation>, Cloneable {
 	public String ipAddress;
 	public long availableHeapSize;
 	public long usedHeapSize;

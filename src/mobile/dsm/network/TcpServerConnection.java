@@ -1,10 +1,15 @@
 package mobile.dsm.network;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -150,6 +155,10 @@ public class TcpServerConnection implements Connectivity {
 	@Override
 	public String read() {
 		try {
+			if (br == null) {
+				if (this.socket != null)
+					br = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+			}
 			return br.readLine();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -207,5 +216,47 @@ public class TcpServerConnection implements Connectivity {
 			e.printStackTrace();
 		}
 
+	}
+
+	public byte[] readFile() {
+		byte[] bytearray = null;
+		try {
+			int bytesRead;
+			int currentTot = 0;
+			int filesize = Integer.parseInt(this.read()) + 10;
+			bytearray = new byte[filesize];
+			InputStream is = socket.getInputStream();
+			// FileOutputStream fos = new FileOutputStream("temp.txt");
+			// BufferedOutputStream bos = new BufferedOutputStream(fos);
+			bytesRead = is.read(bytearray, 0, bytearray.length);
+			currentTot = bytesRead;
+			do {
+				bytesRead = is.read(bytearray, currentTot, (bytearray.length - currentTot));
+				if (bytesRead >= 0)
+					currentTot += bytesRead;
+			} while (bytesRead > -1);
+			// bos.write(bytearray, 0, currentTot);
+			// bos.flush();
+			// bos.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return bytearray;
+	}
+
+	public void writeFile(File file) {
+		try {
+			PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
+			this.write(String.valueOf(file.length()));
+			byte[] bytearray = new byte[(int) file.length()];
+			FileInputStream fin = new FileInputStream(file);
+			BufferedInputStream bin = new BufferedInputStream(fin);
+			bin.read(bytearray, 0, bytearray.length);
+			OutputStream os = socket.getOutputStream();
+			os.write(bytearray, 0, bytearray.length);
+			os.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

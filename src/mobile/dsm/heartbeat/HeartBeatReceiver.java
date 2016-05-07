@@ -23,11 +23,12 @@ public class HeartBeatReceiver extends Thread {
 
 	@Override
 	public void run() {
-		HeartBeatObject hbo = (HeartBeatObject) this.conn.readObject();
-		if (AvailableSlaves.allSlaves.containsKey(hbo.raspberryPieId)) {
+		String raspberryPie = this.conn.read();
+		if (AvailableSlaves.allSlaves.containsKey(raspberryPie)) {
 			System.out.println("Update");
-			AvailableSlaves.update(hbo);
+			AvailableSlaves.update(raspberryPie);
 		} else {
+			HeartBeatObject hbo = (HeartBeatObject) this.conn.readObject();
 			System.out.println("New Slave");
 			AvailableSlaves.newSlave(hbo);
 		}

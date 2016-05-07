@@ -20,10 +20,12 @@ public class HeartBeatSender {
 	public final String raspberryPieId;
 	private ScheduledExecutorService execute;
 	private TcpServerConnection conn;
+	private HeartBeatObject hbo;
+	private boolean isRegistered;
 
-	public HeartBeatSender(String raspberryPieID) {
+	public HeartBeatSender(String raspberryPieID, HeartBeatObject hbo) {
 		this.raspberryPieId = raspberryPieID;
-
+		this.hbo = hbo;
 	}
 
 	/**
@@ -38,8 +40,13 @@ public class HeartBeatSender {
 	private void sendHeartBeat() {
 		System.out.println(this.raspberryPieId + " Sending heartbeat");
 		conn = new TcpServerConnection(HostName_Port.HEARTBEATMANAGER_HOSTNAME, HostName_Port.HEARTBEATMANAGER_PORT);
+		conn.write(this.raspberryPieId);
 		conn.writerConnection();
-		conn.writeObject(this.creatObject());
+		if (!isRegistered) {
+			System.out.println("registered");
+			conn.writeObject(this.hbo);
+			isRegistered = true;
+		}
 		conn.close();
 	}
 
@@ -54,13 +61,4 @@ public class HeartBeatSender {
 		}
 	}
 
-	private HeartBeatObject creatObject() {
-		runtime = Runtime.getRuntime();
-
-		HeartBeatObject hbj;
-		hbj = new HeartBeatObject(runtime.freeMemory() / Utility.MB,
-				(runtime.totalMemory() - runtime.freeMemory()) / Utility.MB, runtime.totalMemory() / Utility.MB,
-				raspberryPieId);
-		return hbj;
-	}
 }
