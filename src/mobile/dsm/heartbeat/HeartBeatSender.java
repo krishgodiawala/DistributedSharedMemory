@@ -23,9 +23,9 @@ public class HeartBeatSender {
 	private HeartBeatObject hbo;
 	private boolean isRegistered;
 
-	public HeartBeatSender(String raspberryPieID, HeartBeatObject hbo) {
+	public HeartBeatSender(String raspberryPieID) {
 		this.raspberryPieId = raspberryPieID;
-		this.hbo = hbo;
+		this.hbo = this.creatObject(raspberryPieID);
 	}
 
 	/**
@@ -39,14 +39,18 @@ public class HeartBeatSender {
 
 	private void sendHeartBeat() {
 		System.out.println(this.raspberryPieId + " Sending heartbeat");
+
 		conn = new TcpServerConnection(HostName_Port.HEARTBEATMANAGER_HOSTNAME, HostName_Port.HEARTBEATMANAGER_PORT);
 		conn.write(this.raspberryPieId);
 		conn.writerConnection();
-		if (!isRegistered) {
+		// String read =
+		if (conn.read().equals("notExists")) {
+			// if (!isRegistered) {
 			System.out.println("registered");
 			conn.writeObject(this.hbo);
 			isRegistered = true;
 		}
+		// }
 		conn.close();
 	}
 
@@ -59,6 +63,21 @@ public class HeartBeatSender {
 			this.execute = executor;
 			execute.scheduleAtFixedRate(heartbeatsend, 0, Utility.HEARTBEATTIME, TimeUnit.SECONDS);
 		}
+	}
+
+	private HeartBeatObject creatObject(String hostname) {
+		Runtime runtime = Runtime.getRuntime();
+		// long freeMoemory = runtime.freeMemory();
+		// if (freeMoemory > 400) {
+		// freeMoemory = 300;
+		// } else {
+		// freeMoemory = freeMoemory / Utility.MB;
+		// }
+		// System.out.println("Free " + freeMoemory);
+		HeartBeatObject hbj;
+		hbj = new HeartBeatObject(runtime.freeMemory(), (runtime.totalMemory() - runtime.freeMemory()) / Utility.MB,
+				runtime.totalMemory() / Utility.MB, hostname);
+		return hbj;
 	}
 
 }

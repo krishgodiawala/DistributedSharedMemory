@@ -12,7 +12,7 @@ public class HostName_Port {
 	// Port for slave to connect to heart beat manager
 	public static final int HEARTBEATMANAGER_PORT = 1600;
 	// The hostname of heart beat manager
-	public static final String HEARTBEATMANAGER_HOSTNAME = "129.21.115.52";
+	public static final String HEARTBEATMANAGER_HOSTNAME = "129.21.114.254";
 	// Port where master connects to slave
 	public static final int SLAVE_SERVER_CONN_PORT = 1700;
 	// USER connects to the master port

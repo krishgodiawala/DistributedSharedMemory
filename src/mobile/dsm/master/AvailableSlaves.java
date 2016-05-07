@@ -143,6 +143,7 @@ public class AvailableSlaves {
 	}
 
 	public static void newSlave(HeartBeatObject hbo) {
+		//System.out.println(hbo);
 		SlaveInformation si = new SlaveInformation(hbo.raspberryPieId, hbo.availableHeapSize, hbo.usedHeapSize,
 				hbo.totalHeapSize, 0);
 		System.out.println(hbo.getRaspberryPieId());

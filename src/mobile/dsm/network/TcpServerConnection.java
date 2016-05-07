@@ -2,6 +2,7 @@ package mobile.dsm.network;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -96,6 +97,7 @@ public class TcpServerConnection implements Connectivity {
 		return socket;
 	}
 
+
 	/**
 	 * This method instantiates a writer stream
 	 * 
@@ -139,13 +141,23 @@ public class TcpServerConnection implements Connectivity {
 		}
 	}
 
+	public void openWriter() {
+		if (pw == null)
+			try {
+				pw = new PrintWriter(socket.getOutputStream(), true);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	}
+
 	/**
 	 * This method writes to the network
 	 */
 	@Override
 	public void write(String output) {
 		if (pw == null)
-			this.writerConnection();
+			this.openWriter();
 		pw.println(output);
 	}
 

@@ -10,17 +10,12 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.apache.http.util.ByteArrayBuffer;
-
 import com.google.common.primitives.Bytes;
-
 import mobile.dsm.network.TcpServerConnection;
 import mobile.dsm.utils.FileChunks;
 import mobile.dsm.utils.HostName_Port;
 
 public class UserHandler implements Runnable {
-
 	Socket socket;
 
 	public UserHandler(Socket socket) {
@@ -28,7 +23,6 @@ public class UserHandler implements Runnable {
 	}
 
 	/* To get file from the nodes */
-
 	public File getFile(List<MemorySlave> m, String Filename) {
 		List<File> tempFile = new ArrayList<File>();
 		List<MemorySlave> updateMemory = new ArrayList<MemorySlave>();
@@ -42,19 +36,17 @@ public class UserHandler implements Runnable {
 		}
 		SharedMemory.returnSlaves(updateMemory);
 		return (new FileChunks().get(tempFile));
-
 	}
 
-	public void backupHelper(TcpServerConnection conn, byte[] Filesystems) {
+	public void backupHelper(TcpServerConnection conn, byte[] Filesystems, String filename) {
 		String p;
 		if ((p = conn.read()) != null) {
 			String put = new String("put");
 			conn.write(put);
-			conn.read();
 			conn.write(new String("yes"));
 			conn.write(new String("backup"));
-			conn.write(new String());
-
+			conn.write(new String(filename));
+			conn.write(new String(String.valueOf(Filesystems.length)));
 		}
 	}
 
@@ -62,17 +54,15 @@ public class UserHandler implements Runnable {
 	 * This method is used to back up the the file to two appropriate nodes
 	 * based on the available disk memory
 	 */
-	public void backupNodes(List<MemorySlave> slaves, byte[] Filesystems) throws IOException {
-
+	public void backupNodes(List<MemorySlave> slaves, byte[] Filesystems, String file_name) throws IOException {
 		List<MemorySlave> updateMemory = new ArrayList<MemorySlave>();
 		// Iterate through the List to get backup nodes
 		String Backupnode1 = slaves.get(slaves.size() - 1).ipAdress;
 		String Backupnode2 = slaves.get(slaves.size() - 2).ipAdress;
-
 		for (int i = 0; i < 2; i++) {
 			TcpServerConnection conn = new TcpServerConnection(("Backupnode" + i),
 					HostName_Port.SLAVE_SERVER_CONN_PORT);
-			backupHelper(conn, Filesystems);
+			backupHelper(conn, Filesystems, file_name);
 			// sending the back up file to first backup node
 			sendBackup(Filesystems, conn);
 			updateMemory
@@ -81,11 +71,11 @@ public class UserHandler implements Runnable {
 		}
 		SharedMemory.returnSlaves(updateMemory);
 	}
+
 	/*
 	 * This method deletes the file chunk from ythe main memory of the node
 	 * 
 	 */
-
 	public void deleteFileChunk(String filename) {
 		List<MemorySlave> slaves = SharedMemory.getSlaves(filename);
 		List<MemorySlave> updateMemory = new ArrayList<MemorySlave>();
@@ -105,7 +95,6 @@ public class UserHandler implements Runnable {
 			updateMemory.add(new MemorySlave(slaves.get(i).ipAdress, Long.parseLong(conn.read())));
 			conn.close();
 		}
-
 		SharedMemory.returnSlaves(updateMemory);
 	}
 
@@ -117,22 +106,21 @@ public class UserHandler implements Runnable {
 		FileChunks f = new FileChunks(Filesystems);
 		int iteration = (Filesystems.length / 60);
 		int i = 1;
+		conn.write(new String(String.valueOf(iteration + 1)));
 		while (i == iteration) {
-
 			conn.writeByte(f.putbytes(60));
 		}
 		conn.writeByte(f.putbytes(Filesystems.length - (iteration * 60)));
-
 	}
 
-	public void sendFileRequest(List<MemorySlave> slaves, byte[] filename) {
+	public void sendFileRequest(List<MemorySlave> slaves, byte[] filename, String fileName) {
 		List<MemorySlave> updateMemory = new ArrayList<MemorySlave>();
 		FileChunks f = new FileChunks(filename);
 		for (int i = 0; i < slaves.size() - 2; i++) {
-
 			TcpServerConnection conn = new TcpServerConnection(slaves.get(i).ipAdress,
 					HostName_Port.SLAVE_SERVER_CONN_PORT);
 			conn.write(new String("put"));
+			conn.write(new String(fileName));
 			try {
 				conn.writeObject(f.put(slaves.get(i).memory));
 			} catch (IOException e) {
@@ -141,10 +129,8 @@ public class UserHandler implements Runnable {
 			}
 			updateMemory.add(new MemorySlave(slaves.get(i).ipAdress, Long.parseLong(conn.read())));
 			conn.close();
-
 		}
 		SharedMemory.returnSlaves(updateMemory);
-
 	}
 
 	/**
@@ -160,18 +146,16 @@ public class UserHandler implements Runnable {
 				if (slaves.size() > 0) {
 					clientConn.writeObject(getFile(slaves, clientConn.read()));
 				} else {
-
 				}
 			} else if (message.equals("put")) {
-				//Name of the file
+				// Name of the file
 				String fileName = clientConn.read();
 				byte[] file = clientConn.readFile();
-
 				List<MemorySlave> m = (List<MemorySlave>) SharedMemory.getSlaves(file.length, fileName);
 				if (m.size() > 0) {
-					sendFileRequest(m, file);
+					sendFileRequest(m, file, fileName);
 					try {
-						backupNodes(m, file);
+						backupNodes(m, file, fileName);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

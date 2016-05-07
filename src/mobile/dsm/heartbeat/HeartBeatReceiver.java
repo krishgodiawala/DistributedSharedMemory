@@ -25,10 +25,13 @@ public class HeartBeatReceiver extends Thread {
 	public void run() {
 		String raspberryPie = this.conn.read();
 		if (AvailableSlaves.allSlaves.containsKey(raspberryPie)) {
+			conn.write("exists");
 			System.out.println("Update");
 			AvailableSlaves.update(raspberryPie);
 		} else {
+			conn.write("notExists");
 			HeartBeatObject hbo = (HeartBeatObject) this.conn.readObject();
+			System.out.println(hbo);
 			System.out.println("New Slave");
 			AvailableSlaves.newSlave(hbo);
 		}

@@ -13,7 +13,11 @@ public class HeartBeatObject implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1660835436865494100L;
+	private static final long serialVersionUID = 1L;
+	/**
+	 * 
+	 */
+
 	public long availableHeapSize;
 	public long usedHeapSize;
 	public long totalHeapSize;
@@ -41,6 +45,12 @@ public class HeartBeatObject implements Serializable {
 
 	public String getRaspberryPieId() {
 		return raspberryPieId;
+	}
+
+	@Override
+	public String toString() {
+		return "HeartBeatObject [availableHeapSize=" + availableHeapSize + ", usedHeapSize=" + usedHeapSize
+				+ ", totalHeapSize=" + totalHeapSize + ", raspberryPieId=" + raspberryPieId + "]";
 	}
 	
 }

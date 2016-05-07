@@ -33,8 +33,8 @@ public class TestSlaveHeartBeat {
 			e.printStackTrace();
 		}
 		System.out.println("IP " + hostname);
-		hostname = "localhost";
-		HeartBeatSender heartbeatSender = new HeartBeatSender("localhost", creatObject(hostname));
+		//hostname = "localhost";
+		HeartBeatSender heartbeatSender = new HeartBeatSender(hostname);
 		ScheduledExecutorService execute = Executors.newSingleThreadScheduledExecutor();
 		heartbeatSender.enable(execute);
 		new Thread(new Slave()).start();
@@ -45,17 +45,17 @@ public class TestSlaveHeartBeat {
 
 	}
 
-	private static HeartBeatObject creatObject(String hostname) {
+	private HeartBeatObject creatObject(String hostname) {
 		Runtime runtime = Runtime.getRuntime();
-		long freeMoemory = runtime.freeMemory();
-		if (freeMoemory > 400) {
-			freeMoemory = 300;
-		} else {
-			freeMoemory = freeMoemory / Utility.MB;
-		}
-		System.out.println("Free " + freeMoemory);
+//		long freeMoemory = runtime.freeMemory();
+//		if (freeMoemory > 400) {
+//			freeMoemory = 300;
+//		} else {
+//			freeMoemory = freeMoemory / Utility.MB;
+//		}
+//		System.out.println("Free " + freeMoemory);
 		HeartBeatObject hbj;
-		hbj = new HeartBeatObject(freeMoemory, (runtime.totalMemory() - runtime.freeMemory()) / Utility.MB,
+		hbj = new HeartBeatObject(runtime.freeMemory(), (runtime.totalMemory() - runtime.freeMemory()) / Utility.MB,
 				runtime.totalMemory() / Utility.MB, hostname);
 		return hbj;
 	}
