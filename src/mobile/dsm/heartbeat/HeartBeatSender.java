@@ -11,8 +11,9 @@ import mobile.dsm.utils.Utility;
 /**
  * This class sends heart beats every 5 seconds
  * 
- * @author Vishwas Tantry
  * @author Krish Godiawala
+ * @author Vishwas Tantry
+ * 
  *
  */
 public class HeartBeatSender {
@@ -65,15 +66,14 @@ public class HeartBeatSender {
 		}
 	}
 
+	/**
+	 * Create a hearbeat object
+	 * 
+	 * @param hostname
+	 * @return
+	 */
 	private HeartBeatObject creatObject(String hostname) {
 		Runtime runtime = Runtime.getRuntime();
-		// long freeMoemory = runtime.freeMemory();
-		// if (freeMoemory > 400) {
-		// freeMoemory = 300;
-		// } else {
-		// freeMoemory = freeMoemory / Utility.MB;
-		// }
-		// System.out.println("Free " + freeMoemory);
 		HeartBeatObject hbj;
 		hbj = new HeartBeatObject(runtime.freeMemory(), (runtime.totalMemory() - runtime.freeMemory()) / Utility.MB,
 				runtime.totalMemory() / Utility.MB, hostname);

@@ -1,10 +1,12 @@
 package mobile.dsm.network;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,6 +18,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
+ * This class creates a server and client socket and provides a bunch of methods
+ * on them
+ * 
  * @author Vishwas Tantry
  * @author Krish Godiawala
  */
@@ -30,6 +35,9 @@ public class TcpServerConnection implements Connectivity {
 	private ObjectOutputStream oos;
 	boolean isClientSocket;
 
+	/*
+	 * Start a new server connection
+	 */
 	public TcpServerConnection(int port) {
 		try {
 			serverSocket = new ServerSocket(port);
@@ -39,11 +47,22 @@ public class TcpServerConnection implements Connectivity {
 		}
 	}
 
+	/**
+	 * Opens a new Server Connection
+	 * 
+	 * @param socket
+	 */
 	public TcpServerConnection(Socket socket) {
 		isClientSocket = true;
 		this.socket = socket;
 	}
 
+	/**
+	 * OPens a client connection
+	 * 
+	 * @param ipAddress
+	 * @param port
+	 */
 	public TcpServerConnection(String ipAddress, int port) {
 		try {
 			this.socket = new Socket(ipAddress, port);
@@ -57,6 +76,11 @@ public class TcpServerConnection implements Connectivity {
 
 	}
 
+	/**
+	 * Returns the socket instance
+	 * 
+	 * @return
+	 */
 	public Socket getSocket() {
 		if (this.socket != null)
 			return socket;
@@ -85,6 +109,9 @@ public class TcpServerConnection implements Connectivity {
 		return null;
 	}
 
+	/**
+	 * accepts a socket
+	 */
 	public Socket createConnection() {
 		try {
 			// if (socket == null)
@@ -96,7 +123,6 @@ public class TcpServerConnection implements Connectivity {
 		}
 		return socket;
 	}
-
 
 	/**
 	 * This method instantiates a writer stream
@@ -125,6 +151,7 @@ public class TcpServerConnection implements Connectivity {
 	public void close() {
 		try {
 			if (socket != null) {
+				socket.shutdownOutput();
 				socket.close();
 				socket = null;
 			}
@@ -141,6 +168,9 @@ public class TcpServerConnection implements Connectivity {
 		}
 	}
 
+	/**
+	 * Opens a print writer
+	 */
 	public void openWriter() {
 		if (pw == null)
 			try {
@@ -213,16 +243,29 @@ public class TcpServerConnection implements Connectivity {
 		return obj;
 	}
 
-	/*
+	/**
 	 * This method writes the byte array onto the network
 	 * 
 	 * @param obj
 	 */
 	public void writeByte(byte[] m) {
+		this.write(String.valueOf(m.length));
+		System.out.println("File side inside sender" + m.length);
+		// byte[] bytearray = m;
+		OutputStream os;
 		try {
-			if (this.oos == null)
-				this.oos = new ObjectOutputStream(this.socket.getOutputStream());
-			this.oos.write(m);
+			Thread.sleep(5000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		try {
+			os = socket.getOutputStream();
+			// bos = new BufferedOutputStream(os);
+			os.write(m, 0, m.length);
+			os.flush();
+			// bos.flush();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -230,23 +273,42 @@ public class TcpServerConnection implements Connectivity {
 
 	}
 
+	/**
+	 * This method reads bytes from the network
+	 * 
+	 * @return
+	 */
 	public byte[] readFile() {
+
 		byte[] bytearray = null;
 		try {
-			int bytesRead;
 			int currentTot = 0;
-			int filesize = Integer.parseInt(this.read()) + 10;
+			// DataInputStream dis = new
+			// DataInputStream(socket.getInputStream());
+			int filesize = Integer.parseInt(this.read());
+			System.out.println(filesize);
 			bytearray = new byte[filesize];
 			InputStream is = socket.getInputStream();
-			// FileOutputStream fos = new FileOutputStream("temp.txt");
-			// BufferedOutputStream bos = new BufferedOutputStream(fos);
+			int bytesRead;
+			int btsRead = filesize;
 			bytesRead = is.read(bytearray, 0, bytearray.length);
 			currentTot = bytesRead;
+			btsRead -= bytesRead;
+			// System.out.println("1 Bytes Left " + btsRead + " BytesRead " +
+			// bytesRead);
 			do {
 				bytesRead = is.read(bytearray, currentTot, (bytearray.length - currentTot));
-				if (bytesRead >= 0)
+				if (bytesRead > 0) {
 					currentTot += bytesRead;
-			} while (bytesRead > -1);
+					btsRead -= bytesRead;
+				}
+				// System.out.println("Bytes Left " + btsRead + " BytesRead " +
+				// bytesRead);
+			} while (bytesRead >= 0 && btsRead > 0);
+			System.out.println("Last bytesRead" + bytesRead);
+			System.out.println("Difference in FileSize " + (filesize - currentTot) + " " + btsRead);
+			System.out.println(currentTot);
+
 			// bos.write(bytearray, 0, currentTot);
 			// bos.flush();
 			// bos.close();
@@ -256,17 +318,29 @@ public class TcpServerConnection implements Connectivity {
 		return bytearray;
 	}
 
+	/**
+	 * This method writes the file to the network
+	 * 
+	 * @param file
+	 */
 	public void writeFile(File file) {
 		try {
-			PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
 			this.write(String.valueOf(file.length()));
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			byte[] bytearray = new byte[(int) file.length()];
 			FileInputStream fin = new FileInputStream(file);
 			BufferedInputStream bin = new BufferedInputStream(fin);
 			bin.read(bytearray, 0, bytearray.length);
+			BufferedOutputStream bos;
 			OutputStream os = socket.getOutputStream();
-			os.write(bytearray, 0, bytearray.length);
-			os.flush();
+			bos = new BufferedOutputStream(os);
+			bos.write(bytearray, 0, bytearray.length);
+			bos.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

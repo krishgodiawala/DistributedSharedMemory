@@ -1,6 +1,7 @@
 package mobile.dsm.utils;
 
 /**
+ * This class contains IP addresss and port numbers
  * @author Vishwas Tantry
  * @author Krish Godiawala
  *
@@ -12,7 +13,7 @@ public class HostName_Port {
 	// Port for slave to connect to heart beat manager
 	public static final int HEARTBEATMANAGER_PORT = 1600;
 	// The hostname of heart beat manager
-	public static final String HEARTBEATMANAGER_HOSTNAME = "129.21.114.254";
+	public static final String HEARTBEATMANAGER_HOSTNAME = "129.21.112.255";
 	// Port where master connects to slave
 	public static final int SLAVE_SERVER_CONN_PORT = 1700;
 	// USER connects to the master port

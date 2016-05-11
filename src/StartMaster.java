@@ -1,4 +1,4 @@
-package test;
+
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -6,9 +6,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import mobile.dsm.heartbeat.HeartBeatManager;
 import mobile.dsm.master.SharedMemory;
 
-public class TestMasterHeartBeat {
+/**
+ * This class Starts the HeartBeat Manager as well as instantiates the shared memory Master
+ * @author krishgodiawala
+ *
+ */
+public class StartMaster {
 
-	public TestMasterHeartBeat() {
+	public StartMaster() {
 
 	}
 
@@ -17,14 +22,5 @@ public class TestMasterHeartBeat {
 		ScheduledExecutorService execute = Executors.newSingleThreadScheduledExecutor();
 		new Thread(new SharedMemory()).start();
 		hbm.enable(execute);
-		// long start1 = System.currentTimeMillis();
-		// try {
-		// Thread.sleep(5000);
-		// } catch (InterruptedException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// System.out.println(System.currentTimeMillis() - start1);
-
 	}
 }

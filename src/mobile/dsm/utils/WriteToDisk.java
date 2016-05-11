@@ -1,56 +1,128 @@
 package mobile.dsm.utils;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.Socket;
 
 import mobile.dsm.network.TcpServerConnection;
 
+/**
+ * @author VishwasTantry
+ * 
+ * @author krishgodiawala
+ *
+ */
 public class WriteToDisk {
+	public static void readBackUp() {
 
-	public static void write(String filename, TcpServerConnection conn, int numberOfChunks, long filelength)
-			throws IOException {
+	}
+
+	/**
+	 * This method writes the bytes to the file
+	 * 
+	 * @param filename
+	 * @param conn
+	 * @param filelength
+	 * @throws IOException
+	 */
+	public static void write(String filename, TcpServerConnection conn, int filelength) throws IOException {
 		// TODO Auto-generated constructor stub
 		InputStream reader = conn.getSocket().getInputStream();
 		File file = new File(filename);
 
 		FileOutputStream fileoutput = new FileOutputStream(file);
-		int chunk = 0;
-		byte b[] = new byte[60];
 
-		while (chunk == numberOfChunks - 1) {
+		byte[] b = new byte[60];
+		// InputStream is = socket.getInputStream();
+		int bytesRead = 0;
+		int btsRead = filelength;
 
-			fileoutput.write(reader.read(b, 0, b.length));
-			fileoutput.flush();
-			chunk++;
+		int currentTot = 0;
 
-		}
-
-		fileoutput.write(reader.read(b, 0, (int) filelength - (60 * (numberOfChunks - 1))));
-		fileoutput.flush();
-		fileoutput.close();
+		do {
+			bytesRead = reader.read(b);
+			if (bytesRead > 0) {
+				fileoutput.write(b, 0, bytesRead);
+				fileoutput.flush();
+				currentTot += bytesRead;
+				btsRead -= bytesRead;
+			}
+		} while (bytesRead > 0 && btsRead > 0);
+		System.out.println("Difference in fileSize " + btsRead);
 	}
 
-	public static void read(String fileName, String ipAddress, int port) throws IOException {
-		TcpServerConnection conn = new TcpServerConnection(ipAddress, port);
+	/**
+	 * This method reads the file from the network 60 bytes at a time
+	 * 
+	 * @param fileName
+	 * @param conn
+	 * @param size
+	 * @throws IOException
+	 */
+	public static void read(String fileName, TcpServerConnection conn, int size) throws IOException {
+
 		int size_of_chunks = 60;
-		byte filechunks[] = new byte[size_of_chunks];
+		byte filechunks[] = new byte[size];
 		int chunk_number = 0;
 		FileInputStream file_input = new FileInputStream(fileName);
 
-		int rc = file_input.read(filechunks);
-		while (rc == 60) {
-			conn.writeByte(filechunks);
-			filechunks = new byte[60];
-			rc = file_input.read(filechunks);
-		}
-		byte[] filechunks1 = Arrays.copyOfRange(filechunks, 0, rc);
-		conn.writeByte(filechunks1);
+		int totalBytesRead = 0;
+		int bytesRead = 0;
+		conn.write("sending");
+		Socket sock = conn.getSocket();
+		OutputStream os = sock.getOutputStream();
+		os.write(filechunks, 0, filechunks.length);
+		;
 	}
 
+	/**
+	 * This method sends chunks
+	 * 
+	 * @param file
+	 * @param conn
+	 */
+	public static void sendChunks(String file, TcpServerConnection conn) {
+
+		FileInputStream fin;
+		try {
+			File f = new File(file);
+			int fileLength = (int) file.length();
+			byte[] bytearray = new byte[60];
+			int totalLeft = fileLength;
+			fin = new FileInputStream(f);
+			BufferedInputStream bin = new BufferedInputStream(fin);
+			Socket socket = conn.getSocket();
+			OutputStream os = socket.getOutputStream();
+			PrintWriter pw = new PrintWriter(os, true);
+			pw.println(fileLength);
+			System.out.println(fileLength);
+			while (totalLeft > 0) {
+				int bytesRead = bin.read(bytearray, 0, bytearray.length);
+				if (bytesRead > 0) {
+					os.write(bytearray, 0, bytearray.length);
+					totalLeft -= bytesRead;
+				}
+				System.out.println("Total Left " + totalLeft);
+				if (totalLeft < 60 && totalLeft > 0) {
+					bytearray = new byte[totalLeft];
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * This method deletes the file
+	 * 
+	 * @param fileName
+	 */
 	public static void deleteFile(String fileName) {
 		File file = new File(fileName);
 		if (file.delete()) {

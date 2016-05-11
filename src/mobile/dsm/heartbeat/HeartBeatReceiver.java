@@ -8,8 +8,9 @@ import mobile.dsm.network.TcpServerConnection;
 /**
  * This class receives Heart Beats
  * 
- * @author Vishwas Tantry
  * @author Krish Godiawala
+ * @author Vishwas Tantry
+ * 
  *
  */
 public class HeartBeatReceiver extends Thread {
@@ -26,7 +27,7 @@ public class HeartBeatReceiver extends Thread {
 		String raspberryPie = this.conn.read();
 		if (AvailableSlaves.allSlaves.containsKey(raspberryPie)) {
 			conn.write("exists");
-			System.out.println("Update");
+			// System.out.println("Update");
 			AvailableSlaves.update(raspberryPie);
 		} else {
 			conn.write("notExists");

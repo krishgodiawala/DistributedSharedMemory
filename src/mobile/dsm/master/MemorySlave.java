@@ -1,5 +1,11 @@
 package mobile.dsm.master;
 
+/**
+ * Slave and its corresponding  memory block
+ * @author Vishwas Tantry
+ * @author krishgodiawala
+ *
+ */
 public class MemorySlave {
 	String ipAdress;
 	long memory;

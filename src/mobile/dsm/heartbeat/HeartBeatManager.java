@@ -33,6 +33,9 @@ public class HeartBeatManager implements Runnable {
 		}
 	};
 
+	/**
+	 * Checks if node is alive
+	 */
 	private void checkisAlive() {
 		for (Entry<String, SlaveInformation> slaveInfo : AvailableSlaves.allSlaves.entrySet()) {
 			System.out.println(System.currentTimeMillis() + " " + slaveInfo.getValue().timeStamp + " "
@@ -45,6 +48,11 @@ public class HeartBeatManager implements Runnable {
 		}
 	}
 
+	/**
+	 * Enables heart beat
+	 * 
+	 * @param executor
+	 */
 	public void enable(ScheduledExecutorService executor) {
 		if (executor != null) {
 			new Thread(this).start();

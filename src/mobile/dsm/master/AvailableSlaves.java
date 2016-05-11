@@ -10,6 +10,13 @@ import mobile.dsm.heartbeat.HeartBeatObject;
 import mobile.dsm.slave.SlaveInformation;
 import mobile.dsm.utils.Utility;
 
+/**
+ * This class is a part of master which stores the slave and information of
+ * about slave
+ * 
+ * @author krishgodiawala
+ * @author Vishwas Tantry
+ */
 public class AvailableSlaves {
 
 	public static ConcurrentHashMap<String, SlaveInformation> allSlaves = new ConcurrentHashMap<String, SlaveInformation>();
@@ -26,6 +33,13 @@ public class AvailableSlaves {
 		return slavesWithAvailableMemory;
 	}
 
+	/**
+	 * This class returns a list of slaves with available memory provide in the
+	 * function
+	 * 
+	 * @param memory
+	 * @return
+	 */
 	public static List<MemorySlave> getSlaves(long memory) {
 		synchronized (allSlaves) {
 			List<MemorySlave> slavesWithAvailableMemory = new ArrayList<MemorySlave>();
@@ -35,7 +49,7 @@ public class AvailableSlaves {
 				alist.add((SlaveInformation) slaveInfo.getValue().clone());
 			}
 			Collections.sort(alist);
-			outer: while (alist.size() <= 2) {
+			outer: while (alist.size() >= 2) {
 				for (int i = 0; i < alist.size() - 2; i++) {
 					if (!alist.get(i).isBusy) {
 						if (alist.get(i).availableHeapSize >= Utility.MAX_CHUNK_SIZE) {
@@ -65,6 +79,7 @@ public class AvailableSlaves {
 						break outer;
 				}
 			}
+			// Nodes for backup
 			slavesWithAvailableMemory.add(new MemorySlave(alist.get(alist.size() - 2).ipAddress, 0));
 			slavesWithAvailableMemory.add(new MemorySlave(alist.get(alist.size() - 1).ipAddress, 0));
 			if (totalRequiredMemory <= 0)
@@ -77,6 +92,11 @@ public class AvailableSlaves {
 
 	}
 
+	/**
+	 * This method provides lock on slaves requested
+	 * 
+	 * @param lockOnSlaves
+	 */
 	public static void getLockOnSlaves(List<MemorySlave> lockOnSlaves) {
 		synchronized (allSlaves) {
 			boolean retry = true;
@@ -102,6 +122,11 @@ public class AvailableSlaves {
 		}
 	}
 
+	/**
+	 * This method gives the locks back
+	 * 
+	 * @param returningSlaves
+	 */
 	/// Update code to update the returned information
 	public static void returnSlaves(List<MemorySlave> returningSlaves) {
 		synchronized (allSlaves) {
@@ -111,6 +136,11 @@ public class AvailableSlaves {
 		}
 	}
 
+	/**
+	 * This method update the memory values of the returning slaves
+	 * 
+	 * @param returningSlaves
+	 */
 	private static void updateValues(List<MemorySlave> returningSlaves) {
 		for (int i = 0; i < returningSlaves.size(); i++) {
 			SlaveInformation sio = allSlaves.get(returningSlaves.get(i).ipAdress);
@@ -119,12 +149,26 @@ public class AvailableSlaves {
 
 	}
 
+	/**
+	 * This method sets the status of slave to busy or not
+	 * 
+	 * @param slavesWithAvailableMemory
+	 * @param value
+	 */
 	private static void setIsBusyOrNot(List<MemorySlave> slavesWithAvailableMemory, boolean value) {
 		for (MemorySlave memSlave : slavesWithAvailableMemory) {
 			allSlaves.get(memSlave.ipAdress).isBusy = value;
 		}
 	}
 
+	/**
+	 * This method allocates the space for the each of the slave
+	 * 
+	 * @param alist
+	 * @param i
+	 * @param allocate
+	 * @param slavesWithAvailableMemory
+	 */
 	public static void allocateSpace(List<SlaveInformation> alist, int i, long allocate,
 			List<MemorySlave> slavesWithAvailableMemory) {
 		alist.get(i).availableDiskSpace -= allocate;
@@ -135,15 +179,24 @@ public class AvailableSlaves {
 			slavesWithAvailableMemory.add(new MemorySlave(alist.get(i).ipAddress, allocate));
 	}
 
+	/**
+	 * This method registers the time stamps of each of the pie
+	 * 
+	 * @param raspberryPie
+	 */
 	public static void update(String raspberryPie) {
 		SlaveInformation si = allSlaves.get(raspberryPie);
-		System.out.println("in update");
 		si.timeStamp();
 		// set(hbo, si);
 	}
 
+	/**
+	 * When a new slave connects register the slave
+	 * 
+	 * @param hbo
+	 */
 	public static void newSlave(HeartBeatObject hbo) {
-		//System.out.println(hbo);
+		// System.out.println(hbo);
 		SlaveInformation si = new SlaveInformation(hbo.raspberryPieId, hbo.availableHeapSize, hbo.usedHeapSize,
 				hbo.totalHeapSize, 0);
 		System.out.println(hbo.getRaspberryPieId());

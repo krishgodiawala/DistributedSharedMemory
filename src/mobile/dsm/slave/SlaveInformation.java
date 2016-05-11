@@ -1,5 +1,10 @@
 package mobile.dsm.slave;
 
+/**
+ * Complete information about each slave including whether it is busy as well memory information 
+ * @author krishgodiawala
+ *
+ */
 public class SlaveInformation implements Comparable<SlaveInformation>, Cloneable {
 	public String ipAddress;
 	public long availableHeapSize;
@@ -21,9 +26,12 @@ public class SlaveInformation implements Comparable<SlaveInformation>, Cloneable
 
 	@Override
 	public int compareTo(SlaveInformation o) {
-		return Long.compare(this.availableHeapSize, o.availableHeapSize);
+		return -Long.compare(this.availableHeapSize, o.availableHeapSize);
 	}
 
+	/**
+	 * Time stamps the slave when heatbeat is received
+	 */
 	public void timeStamp() {
 		timeStamp = System.currentTimeMillis();
 	}
@@ -39,6 +47,9 @@ public class SlaveInformation implements Comparable<SlaveInformation>, Cloneable
 		return this;
 	}
 
+	/**
+	 * Creates a deep copy
+	 */
 	public Object clone() {
 		try {
 			SlaveInformation sio = (SlaveInformation) super.clone();

@@ -12,13 +12,21 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
+/**
+ * This class creates chunks the object into byte arrays
+ * @author Vishwas Tantry
+ * @author krishgodiawala
+ *
+ */
 public class FileChunks {
 	int chunk_number = 0;
 	int last_read = 0;
 	File file;
 	byte[] filename;
 
+	/*
+	 *  
+	 */
 	public FileChunks() {
 
 	}
@@ -30,7 +38,16 @@ public class FileChunks {
 	public FileChunks(byte[] filename) {
 		this.filename = filename;
 	}
+	
+	/**
+	 * The function gives returns the file chunks of file based on the size
+	 * 
+	 * @param size
+	 * @return
+	 * @throws IOException
+	 */
 
+	@Deprecated
 	public File put(long size) throws IOException {
 		long size_of_chunks = 0;
 		if (file.length() - last_read >= size) {
@@ -50,6 +67,11 @@ public class FileChunks {
 		return file_chunks;
 	}
 
+	/**
+	 * This method returns a byte array array with the requested size
+	 * @param size
+	 * @return
+	 */
 	public byte[] putbytes(long size) {
 		long size_of_chunks = 0;
 		if (filename.length - last_read >= size) {
@@ -66,6 +88,11 @@ public class FileChunks {
 
 	}
 
+	/**
+	 * This method returns a byte array array with the requested size
+	 * @param size
+	 * @return
+	 */
 	public byte[] putbytes(int size) {
 		long size_of_chunks = 0;
 		if (filename.length - last_read >= size) {
@@ -82,6 +109,7 @@ public class FileChunks {
 
 	}
 
+	@Deprecated
 	public File get(List<File> listoffiles) {
 		String chunk_name = listoffiles.get(0).getName();
 		int file_separator_position = chunk_name.lastIndexOf(".");
