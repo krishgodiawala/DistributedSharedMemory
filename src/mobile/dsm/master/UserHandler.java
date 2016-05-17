@@ -1,5 +1,6 @@
 package mobile.dsm.master;
 
+import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -64,7 +65,10 @@ public class UserHandler implements Runnable {
 			//
 			updateMemory.add(new MemorySlave(m.get(i).ipAdress, Long.parseLong(conn.read())));
 			// conn.close();
+			conn.write("quit");
 		}
+		updateMemory.add(m.get(m.size()-2));
+		updateMemory.add(m.get(m.size()-1));
 		SharedMemory.returnSlaves(updateMemory);
 		// return (new FileChunks().get(tempFile));
 		return b;
@@ -116,7 +120,55 @@ public class UserHandler implements Runnable {
 				}
 			}
 		}
+
 		return bytearray;
+	}
+
+	public byte[] testGetBackUp(String fileName, List<MemorySlave> m, int size) {
+		byte b[] = null;
+		List<MemorySlave> updateMemory = new ArrayList<MemorySlave>();
+		boolean success = false;
+		for (int i = m.size() - 2; i < m.size(); i++) {
+			while (!success) {
+				try {
+					TcpServerConnection conn = new TcpServerConnection(m.get(i).ipAdress,
+							HostName_Port.SLAVE_SERVER_CONN_PORT);
+					conn.write("getBackup");
+					conn.write(fileName);
+					Socket socket = conn.getSocket();
+
+					// InputStream is = socket.getInputStream();
+					DataInputStream dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+					long fileSize = dis.readLong();
+					System.out.println("fileSize " + fileSize);
+					// size = Integer.parseInt(conn.read());
+					byte bytearray[] = null;
+					bytearray = new byte[4026];
+					System.out.println("sds " + fileSize);
+					int n = 0;
+					b = new byte[(int) fileSize];
+					System.out.println("Size of byte array " + b.length);
+					int read = 0;
+					while (fileSize > 0
+							&& (n = dis.read(bytearray, 0, (int) Math.min(bytearray.length, fileSize))) != -1) {
+						System.arraycopy(bytearray, 0, b, read, n);
+						read += n;
+						fileSize -= n;
+						System.out.println("bytesRead " + read);
+					}
+
+					success = true;
+					System.out.println(fileSize);
+					// Long.parseLong(conn.read());
+					conn.write("quit");
+				} catch (IOException e) {
+
+				}
+
+			}
+		}
+		SharedMemory.returnSlaves(m);
+		return b;
 	}
 
 	public void backupHelper(TcpServerConnection conn, byte[] Filesystems, String filename) {
@@ -268,8 +320,10 @@ public class UserHandler implements Runnable {
 					List<MemorySlave> slaves = SharedMemory.getSlaves(fileName);
 					if (slaves.size() > 0) {
 						int size = (int) SharedMemory.getLength(fileName);
-						clientConn.write(String.valueOf(size));
-						clientConn.writeByte(getBackUp(fileName, slaves, size));
+
+						byte b[] = testGetBackUp(fileName, slaves, size);
+						clientConn.write(String.valueOf(b.length));
+						clientConn.writeByte(b);
 					}
 				}
 			}

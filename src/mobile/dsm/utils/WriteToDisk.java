@@ -1,6 +1,7 @@
 package mobile.dsm.utils;
 
 import java.io.BufferedInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -87,35 +88,46 @@ public class WriteToDisk {
 	 * @param file
 	 * @param conn
 	 */
-	public static void sendChunks(String file, TcpServerConnection conn) {
+	/*
+	 * public static void sendChunks(String file, TcpServerConnection conn) {
+	 * 
+	 * FileInputStream fin; try { File f = new File(file); int fileLength =
+	 * (int) file.length(); byte[] bytearray = new byte[60]; int totalLeft =
+	 * fileLength; fin = new FileInputStream(f); BufferedInputStream bin = new
+	 * BufferedInputStream(fin); Socket socket = conn.getSocket(); OutputStream
+	 * os = socket.getOutputStream(); PrintWriter pw = new PrintWriter(os,
+	 * true); pw.println(fileLength); System.out.println(fileLength); while
+	 * (totalLeft > 0) { int bytesRead = bin.read(bytearray, 0,
+	 * bytearray.length); if (bytesRead > 0) { os.write(bytearray, 0,
+	 * bytearray.length); totalLeft -= bytesRead; } System.out.println(
+	 * "Total Left " + totalLeft); if (totalLeft < 60 && totalLeft > 0) {
+	 * bytearray = new byte[totalLeft]; } } } catch (IOException e) {
+	 * e.printStackTrace(); } }
+	 */
 
+	public static int testSendChunks(String f, TcpServerConnection conn) {
+		System.out.println("insidetest");
+		byte[] bytearray = new byte[4026];
 		FileInputStream fin;
 		try {
-			File f = new File(file);
-			int fileLength = (int) file.length();
-			byte[] bytearray = new byte[60];
-			int totalLeft = fileLength;
-			fin = new FileInputStream(f);
-			BufferedInputStream bin = new BufferedInputStream(fin);
+			File file = new File(f);
+			fin = new FileInputStream(file);
+			// BufferedInputStream bin = new BufferedInputStream(fin);
 			Socket socket = conn.getSocket();
-			OutputStream os = socket.getOutputStream();
-			PrintWriter pw = new PrintWriter(os, true);
-			pw.println(fileLength);
-			System.out.println(fileLength);
-			while (totalLeft > 0) {
-				int bytesRead = bin.read(bytearray, 0, bytearray.length);
-				if (bytesRead > 0) {
-					os.write(bytearray, 0, bytearray.length);
-					totalLeft -= bytesRead;
-				}
-				System.out.println("Total Left " + totalLeft);
-				if (totalLeft < 60 && totalLeft > 0) {
-					bytearray = new byte[totalLeft];
-				}
+			DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+			dos.writeLong(file.length());
+			System.out.println("File length " + file.length() + " fileName " + file);
+			int n = 0;
+
+			while ((n = fin.read(bytearray)) != -1) {
+				dos.write(bytearray);
+				dos.flush();
 			}
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return 0;
 	}
 
 	/**

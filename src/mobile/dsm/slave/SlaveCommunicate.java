@@ -104,9 +104,9 @@ public class SlaveCommunicate extends Thread {
 			// int size = Integer.parseInt(conn.read());
 			// System.out.println("Size " + size);
 
-			WriteToDisk.sendChunks(fileName, conn);
-			System.out.println("Write Backup Complete");
-
+			int a = WriteToDisk.testSendChunks(fileName, conn);
+			System.out.println("Write Backup Complete "+a);
+			conn.write(Long.toString(getMemory()));
 		}
 		System.out.println("yep " + conn.read());
 		System.out.println("closing");
@@ -115,6 +115,7 @@ public class SlaveCommunicate extends Thread {
 
 	/**
 	 * Returns current memory instance
+	 * 
 	 * @return
 	 */
 	public long getMemory() {

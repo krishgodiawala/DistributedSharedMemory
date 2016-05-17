@@ -19,7 +19,7 @@ public class TestClient {
 				HostName_Port.MASTERPORT);
 		conn.write(new String("put"));
 
-		File file = new File("test2.txt");
+		File file = new File("output.txt");
 
 		Long fileLength = file.length();
 		conn.write(new String(file.getName()));

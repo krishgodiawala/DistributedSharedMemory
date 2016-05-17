@@ -29,12 +29,12 @@ public class TestBackUp {
 
 		// File file = new File("main.txt");
 
-		conn.write("main.txt");
+		conn.write("Readme.txt");
 		int size = Integer.parseInt(conn.read());
 		byte b[] = new byte[size];
 		Socket soc = conn.getSocket();
 		try {
-			File file = new File("Works.txt");
+			File file = new File("Works2.txt");
 			FileOutputStream fileoutput = new FileOutputStream(file);
 			DataInputStream is = new DataInputStream(soc.getInputStream());
 			System.out.println("size " + size);
